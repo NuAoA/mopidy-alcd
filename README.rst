@@ -18,15 +18,18 @@ Mopidy-ALCD
    :target: https://coveralls.io/r/NuAoA/mopidy-ALCD?branch=master
    :alt: Test coverage
 
-Adds control from Adafruits 16x2 5 button LCD display
+A mopidy frontend that pushes to Adafruits 16x2 5 button LCD display
 
 
 Installation
 ============
-open download directory and run
-python setup.py install or python setup.py develop
 
-Also, you need to install netifaces, run:
+open download directory and run
+    python setup.py install 
+or 
+    python setup.py develop
+
+Also, you need to install the netifaces package, run:
 
 easy_install netifaces
 
@@ -34,11 +37,10 @@ easy_install netifaces
 Configuration
 =============
 
-Before starting Mopidy, you must add configuration for
-Mopidy-ALCD to your Mopidy configuration file::
-
-    [AdafruitLCD]
-    # TODO: Add example of extension config
+Select: opens menus/up a menu (left or right to select option)
+Left: Play/pause
+Right: Next track
+up/down: Volume control
 
 
 Project resources
