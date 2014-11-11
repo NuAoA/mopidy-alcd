@@ -23,15 +23,16 @@ A mopidy frontend that pushes to Adafruits 16x2 5 button LCD display
 
 Installation
 ============
+open download directory and run:
 
-open download directory and run
     python setup.py install 
-or 
+or,
+
     python setup.py develop
 
 Also, you need to install the netifaces package, run:
 
-easy_install netifaces
+    easy_install netifaces
 
 
 Configuration
