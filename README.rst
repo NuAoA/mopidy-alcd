@@ -23,13 +23,12 @@ Adds control from Adafruits 16x2 5 button LCD display
 
 Installation
 ============
+open download directory and run
+python setup.py install or python setup.py develop
 
-Install by running::
+Also, you need to install netifaces, run:
 
-    pip install Mopidy-ALCD
-
-Or, if available, install the Debian/Ubuntu package from `apt.mopidy.com
-<http://apt.mopidy.com/>`_.
+easy_install netifaces
 
 
 Configuration
