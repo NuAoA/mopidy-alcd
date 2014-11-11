@@ -1,5 +1,5 @@
 from mopidy.models import Playlist
-import Adafruit_CharLCD as LCD
+import Adafruit_CharLCD_Mod as LCD
 #from netifaces import interfaces, ifaddresses, AF_INET
 from time import sleep
 

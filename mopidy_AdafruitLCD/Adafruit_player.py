@@ -5,7 +5,7 @@ import mopidy
 from mopidy import core
 import threading
 
-import Adafruit_CharLCD as LCD
+import Adafruit_CharLCD_Mod as LCD
 from .Adafruit_LCD_plate import LCDplate
 from .Adafruit_player_menus import menus
 
