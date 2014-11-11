@@ -1,6 +1,6 @@
 from mopidy.models import Playlist
 import Adafruit_CharLCD as LCD
-from netifaces import interfaces, ifaddresses, AF_INET
+#from netifaces import interfaces, ifaddresses, AF_INET
 from time import sleep
 
 class menus():
@@ -55,11 +55,11 @@ class menus():
 					self.core.tracklist.repeat = not self.core.tracklist.repeat.get()
 				elif index == 2:
 					address=[]
-					for ifaceName in interfaces():
-						addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
-						address.append("".join(addresses))
-					if self.create_menu(address):
-						return True
+					#for ifaceName in interfaces():
+					#	addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
+					#	address.append("".join(addresses))
+					#if self.create_menu(address):
+					#	return True
 
 			else:
 				return
