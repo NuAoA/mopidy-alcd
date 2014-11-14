@@ -18,7 +18,7 @@ Mopidy-ALCD
    :target: https://coveralls.io/r/NuAoA/mopidy-ALCD?branch=master
    :alt: Test coverage
 
-A mopidy frontend that pushes to Adafruits 16x2 5 button LCD display
+A mopidy frontend that pushes to Adafruits 16x2 5 button LCD Pi Plate display
 
 
 Installation
@@ -31,11 +31,15 @@ Also, you need to install the netifaces package, run:
 
     easy_install netifaces
 
+Finally, you need to have setup the Adafruit LCD as outlined in this tutorial:
 
+https://learn.adafruit.com/adafruit-16x2-character-lcd-plus-keypad-for-raspberry-pi/usage
+	
+	
 Configuration
 =============
 
-TODO
+I set this up for my White/Blue LCD display, so if your blacklight doesn't turn on or the colors are off, edit Adafruit_LCD_plate.py
 
 USE
 =============
