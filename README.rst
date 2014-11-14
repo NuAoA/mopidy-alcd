@@ -18,7 +18,7 @@ Mopidy-ALCD
    :target: https://coveralls.io/r/NuAoA/mopidy-ALCD?branch=master
    :alt: Test coverage
 
-A mopidy frontend that pushes to Adafruits 16x2 5 button LCD Pi Plate display
+A mopidy frontend for Adafruits 16x2 5 button LCD Pi Plate display. It has some basic support for library/playlist browsing.
 
 
 Installation
@@ -41,7 +41,7 @@ Configuration
 
 I set this up for my White/Blue LCD display, so if your blacklight doesn't turn on or the colors are off, edit Adafruit_LCD_plate.py
 
-USE
+Useage
 =============
 
 Select: opens menus/up a menu (left and right select option)
