@@ -1,13 +1,26 @@
 from mopidy.models import Playlist
-import Adafruit_CharLCD_Mod as LCD
-#from netifaces import interfaces, ifaddresses, AF_INET
+import Adafruit_CharLCD as LCD
+from netifaces import interfaces, ifaddresses, AF_INET
 from time import sleep
+import logging
+import re
+import pickle
+logger = logging.getLogger(__name__)
+
+
+	
+
 
 class menus():
 	def __init__(self,core,player,plate):
 		self.player=player
 		self.core = core
-		self.plate = plate
+		self.plate = plate 
+		
+	def cPlaylist(self,name="temp",tracks=[]):
+		#new_playlist = self.core.playlists.create(name).get()
+		#print(type(new_playlist))
+		return Playlist(uri="local:playlist:"+name,tracks=tracks,name=name)
 		
 	def menu(self):
 		self.player.inMenus = True
@@ -55,11 +68,11 @@ class menus():
 					self.core.tracklist.repeat = not self.core.tracklist.repeat.get()
 				elif index == 2:
 					address=[]
-					#for ifaceName in interfaces():
-					#	addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
-					#	address.append("".join(addresses))
-					#if self.create_menu(address):
-					#	return True
+					for ifaceName in interfaces():
+						addresses = [i['addr'] for i in ifaddresses(ifaceName).setdefault(AF_INET, [{'addr':'No IP addr'}] )]
+						address.append("".join(addresses))
+					if self.create_menu(address):
+						return True
 
 			else:
 				return
@@ -79,7 +92,12 @@ class menus():
 
 	def menu_playback(self,playlist):
 		while True:
-			list = ["Play "+str(playlist.length)+" Tracks","Add "+str(playlist.length)+" Tracks","Select Track"]
+			if playlist.length>1:
+				list = ["Play "+str(playlist.length)+" Tracks","Add "+str(playlist.length)+" Tracks","Save Playlist","Select Track"]
+			elif playlist.length==1:
+				list = ["Play "+playlist.tracks[0].name,"Add to Tracklist","Save Playlist"]
+			else:
+				logger.error("passed zero length playlist! impossibru!")
 			result,index = self.create_menu(list)
 			if result:
 				if index == -1:
@@ -94,21 +112,29 @@ class menus():
 				elif index==1:
 					self.core.tracklist.add(tracks=playlist.tracks)
 					return True
-				elif index==2:
+				elif index==3:
 					#TODO
-					return True									
+					return True
+				elif index==2:
+					if self.core.playlists.save(playlist) == None:
+						print("PLAYLIST NOT SAVED")
+					else:
+						print("Something was returned")
 			else:
 				return False
 				
-	def menu_browse(self,uri=None):
+	def menu_browse(self,uri=None,forceTracklist=False,Name="Parent"):
 		list = self.core.library.browse(uri).get()
 		tracklist = []
 		for media in list:
 			if media.type == "track":
 				tracklist.append(self.core.library.lookup(media.uri).get()[0])
-		if len(tracklist)>0:
+		if len(tracklist)>0 and not forceTracklist:
 			#have tracks in folder, create playlist to send to menu_playback()
-			return self.menu_playback(Playlist(uri='temp:'+uri, name="temp", tracks=tracklist))
+			if re.match('tunein:',uri):
+				return self.menu_browse(uri=uri,forceTracklist=True,Name=Name)
+			else:
+				return self.menu_playback(self.cPlaylist(name=Name, tracks=tracklist))
 		else:
 			while True:			
 				result,index = self.create_menu(self.get_menu_list(list))
@@ -117,8 +143,11 @@ class menus():
 						return True
 					else:
 						if list[index].type == "directory":
-							if self.menu_browse(uri=list[index].uri):
-								return True						
+							if self.menu_browse(uri=list[index].uri,Name=list[index].name):
+								return True
+						if list[index].type == "track":
+							if self.menu_playback(self.cPlaylist(name=Name, tracks=[self.core.library.lookup(list[index].uri).get()[0]])):
+								return True
 				else:
 					return False
 					
@@ -168,6 +197,7 @@ class menus():
 				if index > 0:
 					index -=1
 			elif button == LCD.LEFT or button == LCD.RIGHT:
+				self.plate.smessage('\x04',whitespace=False)
 				return True,index
 			elif button == LCD.SELECT:
 				return False,index

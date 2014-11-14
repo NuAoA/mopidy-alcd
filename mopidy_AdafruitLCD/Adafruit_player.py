@@ -4,8 +4,8 @@ import pykka
 import mopidy
 from mopidy import core
 import threading
-
-import Adafruit_CharLCD_Mod as LCD
+import re
+import Adafruit_CharLCD as LCD
 from .Adafruit_LCD_plate import LCDplate
 from .Adafruit_player_menus import menus
 
@@ -18,7 +18,6 @@ class AdafruitPlayer():
 		self.state = [None,None] #old,new
 		self.inMenus = False
 		self.plate = LCDplate()
-		self.plate.start("Starting".center(16),"Mopidy LCD".center(16))
 		self.running = False
 		self.resumeFlag = False
 		self.thread = threading.Thread(target=self.buttonLoop)
@@ -27,10 +26,10 @@ class AdafruitPlayer():
 		self.menus=menus(core,self,self.plate)
 
 		
-	def run(self):
+	def start(self):
 		self.running = True
+		self.plate.start("Starting".center(16),"Mopidy LCD".center(16))
 		self.thread.start()
-		traceback.print_exc()
 		
 	def buttonLoop(self):		
 		while self.running:			
@@ -66,7 +65,7 @@ class AdafruitPlayer():
 		nextTrack = self.core.tracklist.next_track(self.core.playback.current_tl_track.get()).get()
 		if nextTrack == None:
 			self.plate.smessage("    Playlist",line=0)
-			self.plate.smessage("    finished",line=1)
+			self.plate.smessage("    Finished",line=1)
 		else:					
 			self.updateCurrentTrack(nextTrack.track,screenUpdate=False)			
 			#Show loading symbol &next track in ~3second downtime until mopidy sends info.
@@ -96,8 +95,8 @@ class AdafruitPlayer():
 			if len(self.tracklist_change_ignore) != 0 and self.compareTracks(track,self.tracklist_change_ignore[0]):
 				self.tracklist_change_ignore.pop(0)
 			else:
-				#not a redundant update	
-				self.track = track		
+				#not a redundant update
+				self.track = track
 				if not self.inMenus and screenUpdate:
 					self.displaySongInfo()
 		elif len(self.tracklist_change_ignore) != 0 and self.track.uri == track.uri:			
@@ -126,7 +125,9 @@ class AdafruitPlayer():
 				self.artistsString +=","
 		return self.artistsString
 		
-	def getPlaybackSymbol(self):
+	def getPlaybackSymbol(self,forceSymbol=""):
+		if forceSymbol != "":
+			return forceSymbol
 		if self.state[1] == "playing":
 			return "\x01"
 		elif self.state[1] == "paused":
@@ -145,12 +146,22 @@ class AdafruitPlayer():
 			
 
 	def displaySongInfo(self,forceSymbol=""):
-		if forceSymbol == "":
-			self.plate.smessage(self.getPlaybackSymbol()+self.track.name)			
+		if self.track != None:
+			if re.match("tunein:",self.track.uri):
+				#We have a radio station, move name to name/artist
+				name_fix = re.match('(.+)\|(.+)',self.track.name)
+				if name_fix:
+					self.plate.smessage(self.getPlaybackSymbol(forceSymbol)+name_fix.group(2))
+					self.plate.smessage(name_fix.group(1),line=1)
+				else:
+					self.plate.smessage(self.getPlaybackSymbol(forceSymbol=forceSymbol)+self.track.name)
+					self.plate.smessage(self.getArtistsAsString(self.track.artists),line=1)
+			else:
+				self.plate.smessage(self.getPlaybackSymbol(forceSymbol=forceSymbol)+self.track.name)
+				self.plate.smessage(self.getArtistsAsString(self.track.artists),line=1)
+			
 		else:
-			self.plate.smessage(forceSymbol+self.track.name)	
-		self.plate.smessage(self.getArtistsAsString(self.track.artists),line=1)
-
+			self.plate.clear()
 	def stop(self):		
 		self.running = False
 		self.plate.stop()

@@ -6,7 +6,10 @@ import pykka
 import mopidy
 import sys
 import re #todo: remove
+import threading
+from time import sleep
 from mopidy import core
+
 from .Adafruit_player import AdafruitPlayer
 logger = logging.getLogger(__name__)
 
@@ -15,12 +18,53 @@ class AdafruitLCD(pykka.ThreadingActor, core.CoreListener):
 		super(AdafruitLCD,self).__init__()
 		self.core = core
 		self.player = AdafruitPlayer(core)
+		self.startup = threading.Thread(target=self.media_scan)
 		#self.player.run()
 	
-	def on_start(self):
-		self.player.run()
-		logger.info("[ALCD] Starting AdafruitLCD")				
-
+	def media_scan(self):
+		media_list = []
+		timeout = 0
+		self.player.plate.smessage("Loading Media...")
+		sleep(2)
+		while self.player.running:
+			if timeout>=50 or self.player.inMenus:
+				if not self.player.inMenus:
+					if len(media_list)==0:					
+						self.player.plate.smessage("No Media Found",line=1)
+					elif self.player.track!=None:
+						self.player.displaySongInfo()
+				break
+			update = False
+			list = self.core.library.browse(None).get()
+			for media in list:
+				if media.name in media_list:
+					pass
+				else:
+					media_list.append(media.name)
+					update = True
+					break
+			if not self.player.inMenus:
+				if len(media_list) > 0:
+					if update:
+						str = ""
+						for item in media_list:
+							if str != "":
+								str = item+", "+str
+							else:
+								str = item					
+						self.player.plate.smessage(str.ljust(16),line=1)
+						sleep(1)
+				else:
+					
+					sleep(5)
+			else:
+				sleep(5)
+			timeout+=1
+					
+	def on_start(self):		
+		logger.info("[ALCD] Starting AdafruitLCD")
+		self.player.start()
+		self.startup.start()
 			
 	def on_stop(self):
 		logger.info("[ALCD] Stopping AdafruitLCD")
@@ -38,13 +82,13 @@ class AdafruitLCD(pykka.ThreadingActor, core.CoreListener):
 					logger.info("[ALCD]  >"+tl_track.track.name+ " by " +artist.name)
 			except:
 				traceback.print_exc()
-			self.player.updateCurrentTrack(tl_track.track) #todo: call on any playback state and not just when playback starts.
+			self.player.updateCurrentTrack(tl_track.track)
 		except:
 			traceback.print_exc()
 		
 	def playback_state_changed(self,old_state,new_state):		
 		try:		
-			logger.info("[ALCD] Playback state changed from " + old_state + " to " + new_state)
+			#logger.info("[ALCD] Playback state changed from " + old_state + " to " + new_state)
 			self.player.updatePlaybackState(old_state,new_state)
 		except:
 			traceback.print_exc()		

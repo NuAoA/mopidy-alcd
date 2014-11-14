@@ -99,14 +99,19 @@ class LCDplate():
 	def smessage(self,text,clear=False,whitespace=True,col=0,line=0):
 		#whitespace will fill message with " " if text < 16 chars to erase old text
 		try:
+			try:
+				msg = text.encode("ascii",'ignore')
+			except:
+				logger.error("Error pushing to display: unable to decode string")
+				msg = text
 			self.messageFlag.wait()
 			self.messageFlag.clear() #attempt to stop screen from pushing garbage when multiple messages get sent
 			if clear:
 				self.lcd.clear()		
 			if whitespace:
-				self.lcd.message(text.ljust(16),col,line)
+				self.lcd.message(msg.ljust(16),col,line)
 			else:
-				self.lcd.message(text,col,line)
+				self.lcd.message(msg,col,line)
 			self.messageFlag.set()
 		except:
 			logger.error("error updating display in smessage")

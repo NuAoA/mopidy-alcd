@@ -26,9 +26,6 @@ Installation
 open download directory and run:
 
     python setup.py install 
-or,
-
-    python setup.py develop
 
 Also, you need to install the netifaces package, run:
 
@@ -38,9 +35,17 @@ Also, you need to install the netifaces package, run:
 Configuration
 =============
 
-Select: opens menus/up a menu (left or right to select option)
+TODO
+
+USE
+=============
+
+Select: opens menus/up a menu (left and right select option)
+
 Left: Play/pause
+
 Right: Next track
+
 up/down: Volume control
 
 
@@ -55,7 +60,7 @@ Project resources
 Changelog
 =========
 
-v0.1.0 (UNRELEASED)
+v0.1.0 (RELEASE)
 ----------------------------------------
 
 - Initial release.
