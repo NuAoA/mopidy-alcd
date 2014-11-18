@@ -18,7 +18,7 @@ Mopidy-ALCD
    :target: https://coveralls.io/r/NuAoA/mopidy-ALCD?branch=master
    :alt: Test coverage
 
-A mopidy frontend for Adafruits 16x2 5 button LCD Pi Plate display. It has some basic support for library/playlist browsing.
+A mopidy frontend for Adafruits 16x2 5 button LCD Pi Plate display. It has some basic support for library/playlist browsing. Tested to work with Spotify, TuneIn, local media, and google plus music
 
 
 Installation
@@ -44,7 +44,7 @@ I set this up for my White/Blue LCD display, so if your blacklight doesn't turn 
 Useage
 =============
 
-Select: opens menus/up a menu (left and right select option)
+Select: opens menus/up a menu (both left and right select option)
 
 Left: Play/pause
 
